@@ -20,9 +20,21 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-
+          
+      - name: Cleanup
+        run: dotnet clean
+        
       - name: Build with dotnet
         run: dotnet build 
+
+      - name: Kill csc.exe process
+        run: |
+          Get-Process | Where-Object { $_.Name -eq "csc" } | Stop-Process -Force
+        shell: pwsh
+
+      - name: Delete obj folder to avoid conflicts
+        run: Remove-Item -Recurse -Force ./Rnwood.SmtpServer/obj/Debug/netstandard2.0
+        shell: pwsh
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
